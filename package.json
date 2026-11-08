@@ -1,0 +1,23 @@
+{
+  "name": "zero-g-hour-nine",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8080 --bind 127.0.0.1",
+    "test": "node qa/physics.test.mjs && node qa/game-flow.test.mjs && node qa/scene.test.mjs",
+    "check": "node participant-delivery-kit-v3.3.2/tools/check.mjs game game/global-items.json",
+    "pack": "npm run build && python3 qa/pack.py",
+    "build": "node qa/build.mjs",
+    "test:browser": "node qa/run.mjs",
+    "deploy": "node qa/deploy.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.27.4",
+    "jsdom": "26.1.0",
+    "playwright": "1.62.1"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "version": "0.2.0"
+}

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#050b13" />
+    <title>失重第九小时 · EVA</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="shared/save-protocol.js"></script>
+  </head>
+  <body>
+    <canvas
+      id="space"
+      aria-label="第一人称舱外冒险；鼠标观察，WASD 推进"
+    ></canvas>
+    <div class="visor" aria-hidden="true">
+      <div class="helmet-top"></div>
+      <div class="helmet-bottom"></div>
+      <div class="crack"></div>
+    </div>
+    <div id="hit-flash" aria-hidden="true"></div>
+    <div class="hud" id="hud">
+      <header>
+        <div class="identity">
+          <span class="logo">◈</span>
+          <div>KEPLER <small>外部作业 / EVA—09</small></div>
+        </div>
+        <div class="heading">
+          <span>NAV</span>
+          <div id="compass">000°</div>
+          <i></i>
+        </div>
+        <div class="mission-time">
+          <i></i>任务进行中 <b id="elapsed">00:00</b
+          ><button id="menu-button" aria-label="打开航服菜单">Ⅱ</button>
+        </div>
+      </header>
+      <section class="mission">
+        <div class="eyebrow">PRIMARY OBJECTIVE</div>
+        <h1>追回最后一株氧气花</h1>
+        <p id="objective">离开气闸，沿空间站外壁接近培养舱。</p>
+        <span id="sector">气闸外缘</span>
+      </section>
+      <div id="world-markers" aria-hidden="true"></div>
+      <div class="reticle" id="reticle">
+        <i></i><i></i><i></i><i></i><b></b>
+      </div>
+      <div class="interact" id="interact">
+        <span id="interact-key">E</span>
+        <div>
+          <strong id="interact-title"></strong
+          ><small id="interact-detail"></small>
+        </div>
+      </div>
+      <div class="repair" id="repair" hidden>
+        <span>正在封堵破口</span>
+        <div><i id="repair-bar"></i></div>
+        <small>保持抓握 · 按住 R</small>
+      </div>
+      <div id="alert" class="alert" role="status" hidden>
+        <span>⚠</span>
+        <div>
+          <strong id="alert-title">航服气密性受损</strong
+          ><small id="alert-detail">寻找补给包，抓稳扶手后用胶带修补。</small>
+        </div>
+      </div>
+      <div class="toast" id="toast" role="status"></div>
+      <div class="status-bottom">
+        <section class="oxygen-panel">
+          <div class="readout-title">
+            <span>O₂ / 航服氧气</span><b id="oxygen-status">循环正常</b>
+          </div>
+          <div class="oxygen-value">
+            <strong id="oxygen">100</strong
+            ><span>%<small id="reserve">剩余约 03:42</small></span>
+          </div>
+          <div class="meter"><i id="oxygen-bar"></i></div>
+          <div class="oxygen-meta">
+            <span>气密性 <b id="leak">完好</b></span
+            ><span>生命 <b id="hp">—</b></span>
+          </div>
+        </section>
+        <section class="flight-panel">
+          <div class="speed">
+            <strong id="speed">0.0</strong><span>m/s</span>
+          </div>
+          <div id="movement-state">自由漂浮</div>
+          <div class="assist" id="assist">惯性导航</div>
+        </section>
+        <section class="equipment-panel">
+          <div class="readout-title">
+            <span>THRUSTER / 推进器</span><b id="heat-label">待机</b>
+          </div>
+          <div class="heat-meter"><i id="heat-bar"></i></div>
+          <div class="equipment-row">
+            <span>温度 <b id="heat">0%</b></span
+            ><span>修补胶带 <b id="tape">0</b></span>
+          </div>
+          <div class="grip-status" id="grip-status">机械臂 / 待命</div>
+        </section>
+      </div>
+      <footer>
+        <span><kbd>W A S D</kbd> 推进</span
+        ><span><kbd>Space / C</kbd> 升降</span><span><kbd>Shift</kbd> 增压</span
+        ><span><kbd>X</kbd> 制动</span><span><kbd>E</kbd> 抓取 / 松开</span
+        ><span><kbd>R</kbd> 修补</span><span><kbd>Esc</kbd> 菜单</span>
+      </footer>
+    </div>
+    <div class="overlay" id="overlay">
+      <section
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <div class="eyebrow" id="modal-kicker">
+          KEPLER STATION · EMERGENCY EVA
+        </div>
+        <h2 id="modal-title">失重<span>第九小时</span></h2>
+        <p id="modal-body">
+          重力环停机九小时。最后一株氧气花正随培养舱漂离空间站。穿过碎片带，把它带回供氧系统。
+        </p>
+        <div id="briefing">
+          <div class="briefing-stats">
+            <div><span>行动区域</span><b>空间站舱外</b></div>
+            <div><span>回收目标</span><b>氧气花培养舱</b></div>
+            <div><span>作业方式</span><b>航服机械臂</b></div>
+          </div>
+          <ul class="instructions">
+            <li>鼠标观察，WASD 推进，Space / C 升降。松手后仍会漂浮。</li>
+            <li>按住 Shift 强力推进；过热后等待冷却。按住 X 随时制动。</li>
+            <li>对准扶手、补给或小陨石按 E，伸出机械臂交互。</li>
+            <li>撞击会造成漏气；取得胶带，抓稳扶手后按住 R 修补。</li>
+          </ul>
+          <p id="previous"></p>
+          <label class="sound-option"
+            ><input id="sound-enabled" type="checkbox" checked /> 航服声音反馈
+            <small>建议佩戴耳机</small></label
+          >
+          <p class="desktop-note">键盘与鼠标操作 · 按 Esc 可打开航服菜单</p>
+        </div>
+        <button class="primary" id="modal-primary">
+          打开气闸，开始行动 <span>↗</span></button
+        ><button class="secondary" id="modal-secondary" hidden>返回航服</button
+        ><button class="danger" id="abort-button" hidden>终止回收任务</button>
+      </section>
+    </div>
+    <script>
+      window.GameProtocol = {
+        read: () => WL.readSave(),
+        complete: (save, options) =>
+          WL.completeLevel(window.CONFIG || {}, save, options),
+      };
+    </script>
+    <script src="app.js"></script>
+  </body>
+</html>
